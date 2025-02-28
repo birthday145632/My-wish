@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            position: relative;
+        }
+        .button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: gold;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .message {
+            font-size: 30px;
+            color: white;
+            display: none;
+            animation: fadeIn 2s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="button" onclick="startAnimation()">Click to See Surprise</button>
+        <div class="message" id="message">🎉 Happy Birthday! 🎉</div>
+        <canvas id="canvas"></canvas>
+    </div>
+    
+    <script>
+        function startAnimation() {
+            document.querySelector('.button').style.display = 'none';
+            document.getElementById('message').style.display = 'block';
+            launchFireworks();
+        }
+
+        function launchFireworks() {
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = [];
+
+            class Particle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    this.radius = Math.random() * 4 + 1;
+                    this.speedX = Math.random() * 4 - 2;
+                    this.speedY = Math.random() * 4 - 2;
+                    this.life = Math.random() * 50 + 50;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life -= 1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+            function createExplosion(x, y) {
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(x, y, `hsl(${Math.random() * 360}, 100%, 50%)`));
+                }
+            }
+            function animate() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((particle, index) => {
+                    particle.update();
+                    particle.draw();
+                    if (particle.life <= 0) particles.splice(index, 1);
+                });
+                requestAnimationFrame(animate);
+            }
+            canvas.addEventListener("click", (e) => createExplosion(e.clientX, e.clientY));
+            animate();
+        }
+    </script>
+</body>
+</html>
